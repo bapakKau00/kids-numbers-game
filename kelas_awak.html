@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelas Awak | Kelas Saya</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/desk.css">
+    <link rel="icon" type="image/png" href="assets/images/number-blocks.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&family=Bubblegum+Sans&display=swap"
+        rel="stylesheet">
+    <style>
+        .split-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 6000;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .hud button,
+        .hud .music-control,
+        .hud .dropdown {
+            pointer-events: auto;
+        }
+
+        .game-panel {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 80px 20px 20px 20px;
+            /* Space for HUD */
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Left Side: Kelas Awak (Kid) */
+        .kid-panel {
+            background: rgba(255, 235, 238, 0.95);
+            border-right: 4px dashed #ff5252;
+        }
+
+        /* Right Side: Kelas Saya (Bot) */
+        .bot-panel {
+            background: rgba(227, 242, 253, 0.95);
+        }
+
+        .side-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            padding: 10px 30px;
+            border-radius: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        .kid-title {
+            background: #ff5252;
+        }
+
+        .bot-title {
+            background: #2196F3;
+        }
+
+        .board-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            width: 100%;
+            flex: 1;
+            max-height: 60vh;
+        }
+
+        /* Inventory shared style */
+        .inventory {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 30px;
+            width: 100px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .draggable-item {
+            font-size: 2.5rem;
+            background: #fff;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .kid-panel .draggable-item {
+            cursor: grab;
+        }
+
+        .kid-panel .draggable-item:active {
+            cursor: grabbing;
+        }
+
+        /* Bot inventory cannot be dragged by user */
+        .bot-panel .draggable-item {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .drop-zone {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .kid-drop-zone {
+            border: 6px dashed #ff5252;
+        }
+
+        .bot-drop-zone {
+            border: 6px dashed #2196F3;
+        }
+
+        .placed-object {
+            position: absolute;
+            font-size: 3rem;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Same size as original */
+            width: 60px;
+            height: 60px;
+            margin-left: -30px;
+            margin-top: -30px;
+        }
+
+        .kid-panel .placed-object {
+            cursor: pointer;
+        }
+
+        /* Bot Animation Styles */
+        .bot-character {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 4rem;
+            animation: float-bot 3s infinite ease-in-out;
+            z-index: 10;
+        }
+
+        @keyframes float-bot {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .bot-virtual-hand {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .bot-dialogue {
+            position: absolute;
+            bottom: 120px;
+            right: 40px;
+            background: white;
+            border: 4px solid #1976d2;
+            border-radius: 20px;
+            padding: 15px;
+            font-family: 'Short Stack', cursive;
+            font-size: 1.5rem;
+            color: #333;
+            width: 220px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: scale(0.8);
+            transform-origin: bottom right;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .bot-dialogue.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .bot-dialogue::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 30px;
+            border-width: 15px 15px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+            display: block;
+            width: 0;
+        }
+
+        .bot-dialogue::before {
+            content: '';
+            position: absolute;
+            bottom: -21px;
+            right: 26px;
+            border-width: 21px 21px 0;
+            border-style: solid;
+            border-color: #1976d2 transparent transparent transparent;
+            display: block;
+            width: 0;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene">
+        <video autoplay muted loop id="bgVideo">
+            <source src="assets/video/KELAS CERIA.mp4" type="video/mp4">
+        </video>
+
+        <div class="hud">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.location.href='index.html'" class="back-btn" style="margin: 0;">Kembali</button>
+                <div class="dropdown">
+                    <button id="gameDropdown" class="back-btn"
+                        style="margin: 0; background: #2196F3; box-shadow: 0 4px 0 #1976D2;">Pilih Game ▾</button>
+                    <div class="dropdown-content">
+                        <a href="game.html">Kenali Nombor</a>
+                        <a href="counting.html">Belajar Mengira</a>
+                        <a href="bantu.html">Bantu Kawan</a>
+                        <a href="robot.html">Sembang Robot</a>
+                        <a href="kelas_awak.html">Kelas Awak | Saya</a>
+                    </div>
+                </div>
+            </div>
+            <button id="resetBtn" class="back-btn"
+                style="background: #ff9800; margin-right: auto; margin-left: 20px;">Padam Semua</button>
+            <div class="music-control" id="musicToggle" style="position: relative;">
+                <span class="music-icon">🔊</span>
+            </div>
+        </div>
+
+        <div class="split-container">
+            <!-- Left Side (Kid) -->
+            <div class="game-panel kid-panel">
+                <div class="side-title kid-title">Kelas Awak 👧👦</div>
+                <div style="font-family: 'Short Stack'; color: #d32f2f; margin-bottom: 10px;">Tekan barang di atas meja!
+                </div>
+
+                <div class="board-wrapper">
+                    <div class="inventory" id="kidInventory">
+                        <div class="draggable-item" draggable="true" data-emoji="📖">📖</div>
+                        <div class="draggable-item" draggable="true" data-emoji="✏️">✏️</div>
+                        <div class="draggable-item" draggable="true" data-emoji="🎒">🎒</div>
+                        <div class="draggable-item" draggable="true" data-emoji="🎨">🎨</div>
+                        <div class="draggable-item" draggable="true" data-emoji="📏">📏</div>
+                    </div>
+                    <div id="kidDropZone" class="drop-zone kid-drop-zone"
+                        style="background: transparent; box-shadow: none; border: none; overflow: visible; display:flex; align-items:center; justify-content:center;">
+                        <div class="desk">
+                            <div class="desk-top"></div>
+                            <div class="desk-leg front-left"></div>
+                            <div class="desk-leg front-right"></div>
+                            <div class="desk-leg back-left"></div>
+                            <div class="desk-leg back-right"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side (Bot) -->
+            <div class="game-panel bot-panel">
+                <div class="side-title bot-title">Kelas Saya 🤖</div>
+                <div style="font-family: 'Short Stack'; color: #1976d2; margin-bottom: 10px;">Saya akan ikut awak!</div>
+
+                <div class="board-wrapper">
+                    <div id="botDropZone" class="drop-zone bot-drop-zone"
+                        style="background: transparent; box-shadow: none; border: none; overflow: visible; display:flex; align-items:center; justify-content:center;">
+                        <div class="desk">
+                            <div class="desk-top"></div>
+                            <div class="desk-leg front-left"></div>
+                            <div class="desk-leg front-right"></div>
+                            <div class="desk-leg back-left"></div>
+                            <div class="desk-leg back-right"></div>
+                        </div>
+                        <div class="bot-character">🤖</div>
+                        <div class="bot-dialogue" id="botDialogue"></div>
+                        <div class="bot-virtual-hand" id="botHand">👆</div>
+                    </div>
+                    <div class="inventory" id="botInventory">
+                        <div class="draggable-item" data-emoji="📖">📖</div>
+                        <div class="draggable-item" data-emoji="✏️">✏️</div>
+                        <div class="draggable-item" data-emoji="🎒">🎒</div>
+                        <div class="draggable-item" data-emoji="🎨">🎨</div>
+                        <div class="draggable-item" data-emoji="📏">📏</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="transition-overlay out" id="transitionOverlay"></div>
+    </div>
+
+    <audio id="popSound" src="assets/audio/pop.mp3" preload="auto"></audio>
+    <audio id="robotBeep" src="assets/audio/intro video sound.m4a" preload="auto"></audio>
+    <!-- Reusing short sound as beep -->
+
+    <script src="js/main.js"></script>
+    <script src="js/kelas_awak.js"></script>
+</body>
+
+</html>

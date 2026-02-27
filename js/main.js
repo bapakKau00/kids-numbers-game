@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial burst and continuous spawn (Only if scene exists and not on final or number1/2 page)
     const currentPage = window.location.pathname.split('/').pop();
-    if (scene && currentPage !== 'final.html' && currentPage !== 'number1.html' && currentPage !== 'number2.html' && currentPage !== 'number3.html' && currentPage !== 'number4.html' && currentPage !== 'number5.html') {
+    if (scene && currentPage !== 'final.html' && currentPage !== 'number1.html' && currentPage !== 'number2.html' && currentPage !== 'number3.html' && currentPage !== 'number4.html' && currentPage !== 'number5.html' && currentPage !== 'robot.html' && currentPage !== 'kelas_awak.html') {
         for (let i = 0; i < 15; i++) {
             setTimeout(createFallingNumber, Math.random() * 5000);
         }
@@ -132,6 +132,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             setTimeout(() => {
                 window.location.href = 'bantu.html';
+            }, 750);
+        });
+    }
+
+    const robotBtn = document.getElementById('robotBtn');
+    if (robotBtn) {
+        robotBtn.addEventListener('click', (e) => {
+            for (let i = 0; i < 20; i++) {
+                createNumberParticle(e.clientX, e.clientY);
+            }
+            if (transitionOverlay) {
+                transitionOverlay.classList.add('active');
+            }
+            setTimeout(() => {
+                window.location.href = 'robot.html';
+            }, 750);
+        });
+    }
+
+    const kelasAwakBtn = document.getElementById('kelasAwakBtn');
+    if (kelasAwakBtn) {
+        kelasAwakBtn.addEventListener('click', (e) => {
+            for (let i = 0; i < 20; i++) {
+                createNumberParticle(e.clientX, e.clientY);
+            }
+            if (transitionOverlay) {
+                transitionOverlay.classList.add('active');
+            }
+            setTimeout(() => {
+                window.location.href = 'kelas_awak.html';
             }, 750);
         });
     }
