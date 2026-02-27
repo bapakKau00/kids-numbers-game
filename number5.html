@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Kelas Ceria - Nombor 5</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/images/number-blocks.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="video-scene">
+        <video autoplay id="bgVideo" class="bg-video">
+            <source src="assets/video/no5 vid.mp4" type="video/mp4">
+        </video>
+
+        <div class="game-overlay">
+            <div class="number-header">
+                <h1 class="number-title"></h1>
+                <button id="showExampleBtn" class="mula-btn example-btn">Contoh</button>
+            </div>
+
+            <div class="back-nav">
+                <button onclick="window.location.href='final.html'" class="back-btn">Kembali</button>
+            </div>
+        </div>
+
+        <!-- Popup Logic -->
+        <div id="popupDim" class="popup-dim"></div>
+        <div id="examplePopup" class="dropdown-popup">
+            <div class="popup-content">
+                <h2>5 Ekor Ikan</h2>
+                <div class="object-example">🐟🐟🐟🐟🐟</div>
+                <button id="closePopupBtn" class="back-btn">Tutup</button>
+            </div>
+        </div>
+
+        <div class="music-control" id="musicToggle">
+            <span class="music-icon">🔊</span>
+        </div>
+
+        <div class="transition-overlay out" id="transitionOverlay"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+

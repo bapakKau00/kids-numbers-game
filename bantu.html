@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bantu Kawan Bilang Objek</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/images/number-blocks.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&family=Bubblegum+Sans&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        .bantu-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Role-based panels */
+        .game-panel {
+            flex: 1;
+            min-height: 100vh;
+            display: none;
+            /* Shown based on role */
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            z-index: 10;
+            box-sizing: border-box;
+        }
+
+        .builder-panel {
+            background: rgba(255, 235, 238, 0.9);
+        }
+
+        .counter-panel {
+            background: rgba(232, 245, 233, 0.9);
+        }
+
+        /* Connection Overlay */
+        .connection-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .connection-card {
+            background: white;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .role-choice {
+            display: flex;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 20px;
+            border-radius: 20px;
+            border: 4px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-btn.active {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .role-btn h3 {
+            font-family: 'Fredoka One';
+            margin-top: 10px;
+        }
+
+        .conn-input {
+            width: 200px;
+            font-size: 2rem;
+            text-align: center;
+            border: 4px solid #ff9800;
+            border-radius: 15px;
+            padding: 10px;
+            font-family: 'Fredoka One';
+            margin: 15px 0;
+        }
+
+        .status-badge {
+            background: #eee;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .my-id-display {
+            font-size: 2.5rem;
+            color: #ff5252;
+            font-family: 'Fredoka One';
+            letter-spacing: 5px;
+            margin: 10px 0;
+        }
+
+        .builder-content {
+            display: flex;
+            width: 100%;
+            flex: 1;
+            gap: 15px;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            align-items: stretch;
+            min-height: 350px;
+            /* Reduced from 450px */
+        }
+
+        .inventory {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            /* Reduced from 10px */
+            padding: 12px;
+            /* Reduced from 15px */
+            background: white;
+            border-radius: 30px;
+            width: 100px;
+            /* Reduced from 110px */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            justify-content: flex-start;
+            flex-shrink: 0;
+            /* Prevent shrinking */
+            height: fit-content;
+            /* Ensure wrap items */
+        }
+
+        .draggable-item {
+            font-size: 2rem;
+            /* Reduced from 2.2rem */
+            cursor: grab;
+            background: #fff;
+            padding: 6px;
+            /* Reduced from 8px */
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 55px;
+            /* Reduced from 65px */
+            height: 55px;
+            /* Reduced from 65px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .builder-drop-zone {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border: 6px dashed #ff5252;
+            border-radius: 30px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Short Stack';
+            color: #ff5252;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Float animation for Pengira */
+        @keyframes float-loop {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(2deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+
+        .floating {
+            animation: float-loop 3s infinite ease-in-out;
+        }
+
+        .side-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .builder-title {
+            background: #ff5252;
+        }
+
+        .counter-title {
+            background: #4caf50;
+        }
+
+        .drop-zone {
+            width: 100%;
+            height: 60vh;
+            background: white;
+            border: 8px solid #4caf50;
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .placed-object {
+            position: absolute;
+            font-size: 3rem;
+            /* Synced with Builder items */
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .ready-btn {
+            background: #ff5252;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            border: none;
+            font-family: 'Fredoka One';
+            box-shadow: 0 8px 0 #b71c1c;
+            margin-top: 15px;
+        }
+
+        .ready-btn:disabled {
+            background: #ccc;
+            box-shadow: 0 8px 0 #999;
+            cursor: not-allowed;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 6000;
+            /* Higher than connection-overlay */
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .hud button,
+        .hud .music-control {
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .builder-content {
+                gap: 10px;
+                padding: 10px;
+                min-height: 350px;
+            }
+
+            .inventory {
+                width: 90px;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .draggable-item {
+                font-size: 2.2rem;
+                width: 60px;
+                height: 60px;
+            }
+
+            .builder-drop-zone {
+                height: auto;
+            }
+
+            .side-title {
+                font-size: 1.4rem;
+            }
+
+            .ready-btn {
+                padding: 10px 30px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene">
+        <div id="connectionOverlay" class="connection-overlay">
+            <div class="connection-card">
+                <h1 style="font-family: 'Fredoka One'; color: #ff9800;">Jom Main! 🤝</h1>
+                <p>Pilih peranan kamu dan hubungkan peranti.</p>
+
+                <div class="role-choice">
+                    <div class="role-btn" id="chooseBuilder">
+                        <span style="font-size: 3rem;">🏗️</span>
+                        <h3>Pembina</h3>
+                    </div>
+                    <div class="role-btn" id="chooseCounter">
+                        <span style="font-size: 3rem;">🔢</span>
+                        <h3>Pengira</h3>
+                    </div>
+                </div>
+
+                <div id="builderConn" style="display: none;">
+                    <p>Beritahu kawan kod ini:</p>
+                    <div class="my-id-display" id="myId">----</div>
+                    <div class="status-badge" id="connStatus">Menunggu kawan...</div>
+                </div>
+
+                <div id="counterConn" style="display: none;">
+                    <p>Masukkan kod kawan:</p>
+                    <input type="text" id="friendId" class="conn-input" placeholder="0000" maxlength="4">
+                    <button id="connectBtn" class="mula-btn"
+                        style="font-size: 1.2rem; padding: 10px 30px;">Sambung</button>
+                    <div class="status-badge" id="joinStatus">Sedia menyambung</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hud">
+            <button onclick="window.location.href='index.html'" class="back-btn" style="margin: 0;">Kembali</button>
+            <div class="music-control" id="musicToggle" style="position: relative;">
+                <span class="music-icon">🔊</span>
+            </div>
+        </div>
+
+        <div class="bantu-container">
+            <!-- Builder View -->
+            <div id="builderView" class="game-panel builder-panel">
+                <div class="side-title builder-title">Kawan A: Pembina</div>
+                <div style="font-family: 'Short Stack'; color: #d32f2f; margin-bottom: 10px; text-align: center;">Tarik
+                    objek ke kawasan mengira! (Maksimum 5)</div>
+
+                <div class="builder-content">
+                    <div class="inventory" id="inventory">
+                        <div class="draggable-item" draggable="true" data-emoji="📖">📖</div>
+                        <div class="draggable-item" draggable="true" data-emoji="✏️">✏️</div>
+                        <div class="draggable-item" draggable="true" data-emoji="🎒">🎒</div>
+                        <div class="draggable-item" draggable="true" data-emoji="🎨">🎨</div>
+                        <div class="draggable-item" draggable="true" data-emoji="📏">📏</div>
+                    </div>
+                    <div id="builderDropZone" class="builder-drop-zone">
+                        <div style="opacity: 0.3; font-size: 1.5rem;">Kawasan Mengira</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; align-items: center; margin-top: 15px; width: 100%;">
+                    <div style="font-family: 'Fredoka One'; margin-bottom: 10px; font-size: 1.5rem;">Objek: <span
+                            id="limitText">0</span> / 5</div>
+                    <div style="display: flex; gap: 20px;">
+                        <button id="readyBtn" class="ready-btn" style="margin-top: 0;">Siap! 👍</button>
+                        <button id="builderReset" class="back-btn" style="background: #ff9800;">Padam Semua</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Counter View -->
+            <div id="counterView" class="game-panel counter-panel">
+                <div class="side-title counter-title">Kawan B: Pengira</div>
+                <div class="drop-zone" id="dropZone">
+                    <div id="hintText"
+                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #4caf50; font-family: 'Fredoka One'; opacity: 0.3; font-size: 1.5rem; text-align: center; pointer-events: none;">
+                        Tunggu Pembina meletakkan objek...
+                    </div>
+                </div>
+                <div id="optionsGrid" style="display: none; gap: 15px; margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Feedback Overlay (Reusing style logic) -->
+        <div id="feedbackOverlay" class="feedback-overlay">
+            <div class="feedback-card">
+                <div id="feedbackEmoji" class="feedback-emoji">🤝</div>
+                <div id="feedbackText" class="feedback-text">Kerjasama yang baik!</div>
+                <button id="nextBtn" class="mula-btn" style="padding: 15px 40px; font-size: 1.8rem;">Main Lagi</button>
+            </div>
+        </div>
+
+        <div class="transition-overlay out" id="transitionOverlay"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/bantu.js"></script>
+</body>
+
+</html>

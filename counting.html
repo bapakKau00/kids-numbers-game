@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Kelas Ceria - Belajar Mengira</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/images/number-blocks.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&family=Bubblegum+Sans&display=swap"
+        rel="stylesheet">
+    <style>
+        .counting-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .question-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            margin-bottom: 30px;
+            border: 8px solid #ff9800;
+        }
+
+        .question-text {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            color: #4e342e;
+            margin-bottom: 20px;
+        }
+
+        .objects-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            font-size: 4rem;
+            min-height: 120px;
+            margin: 20px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+        }
+
+        .options-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .option-btn {
+            padding: 20px 40px;
+            font-size: 3rem;
+            font-family: 'Fredoka One', cursive;
+            background: white;
+            color: #ff9800;
+            border: 5px solid #ff9800;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+            box-shadow: 0 6px 0 #e68a00;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-5px);
+            background: #fff3e0;
+        }
+
+        .option-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #e68a00;
+        }
+
+        .option-btn.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #2e7d32;
+            box-shadow: 0 6px 0 #1b5e20;
+        }
+
+        .option-btn.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #c62828;
+            box-shadow: 0 6px 0 #b71c1c;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .hud button,
+        .hud .music-control {
+            pointer-events: auto;
+        }
+
+        .score-board {
+            background: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+        }
+
+        .feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .feedback-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .feedback-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            transform: scale(0.5);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feedback-overlay.active .feedback-card {
+            transform: scale(1);
+        }
+
+        .feedback-emoji {
+            font-size: 6rem;
+            margin-bottom: 20px;
+        }
+
+        .feedback-text {
+            font-size: 2.5rem;
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene">
+        <div class="hud">
+            <button onclick="goHome()" class="back-btn" style="margin: 0;">🏠 Menu</button>
+            <div class="score-board">Markah: <span id="score">0</span></div>
+            <div class="music-control" id="musicToggle" style="position: relative;">
+                <span class="music-icon">🔊</span>
+            </div>
+        </div>
+
+        <div class="counting-container">
+            <div class="question-box">
+                <h1 class="question-text">Kira objek di bawah:</h1>
+                <div id="objectsDisplay" class="objects-display">
+                    <!-- Emojis will be injected here -->
+                </div>
+                <div class="options-container" id="options">
+                    <!-- Buttons will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="feedbackOverlay" class="feedback-overlay">
+            <div class="feedback-card">
+                <div id="feedbackEmoji" class="feedback-emoji">🌟</div>
+                <div id="feedbackText" class="feedback-text">Hebat!</div>
+                <button id="nextBtn" class="mula-btn" style="padding: 15px 40px; font-size: 1.8rem;">Seterusnya</button>
+            </div>
+        </div>
+
+        <div class="transition-overlay out" id="transitionOverlay"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/counting.js"></script>
+    <script>
+        function goHome() {
+            const overlay = document.getElementById('transitionOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                overlay.classList.remove('out');
+                overlay.classList.add('active');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 750);
+            }
+        }
+    </script>
+</body>
+
+</html>

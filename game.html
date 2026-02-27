@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Kelas Ceria - Jom Belajar!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/images/number-blocks.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="video-scene">
+        <video autoplay muted loop id="bgVideo">
+            <source src="assets/video/KELAS CERIA.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <div class="game-overlay">
+            <div class="game-header">
+                <h1>Misi Mencari Nombor</h1>
+            </div>
+
+            <div class="game-content">
+                <!-- Game elements will go here -->
+                <div class="back-nav" style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 30px;">
+                    <button onclick="window.location.href='index.html'" class="back-btn">Kembali</button>
+                    <div class="dropdown">
+                        <button id="gameDropdown" class="back-btn"
+                            style="background: #2196F3; box-shadow: 0 4px 0 #1976D2;">Pilih Game ▾</button>
+                        <div class="dropdown-content">
+                            <a href="game.html">Kenali Nombor</a>
+                            <a href="counting.html">Belajar Mengira</a>
+                            <a href="bantu.html">Bantu Kawan</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-actions">
+                    <button id="startGameBtn" class="mula-btn">Mula</button>
+                </div>
+            </div>
+        </div>
+        <div class="music-control" id="musicToggle">
+            <span class="music-icon">🔊</span>
+        </div>
+        <div class="transition-overlay out" id="transitionOverlay"></div>
+    </div>
+
+    <audio id="introSound" src="assets/audio/intro video sound.m4a"></audio>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Intro Sound Logic
+            const introSound = document.getElementById('introSound');
+            if (introSound) {
+                introSound.volume = 0.6;
+                const playIntro = () => {
+                    introSound.play().catch(err => console.log("Intro sound autoplay blocked:", err));
+                    document.removeEventListener('click', playIntro);
+                };
+                introSound.play().catch(() => {
+                    document.addEventListener('click', playIntro);
+                });
+            }
+
+            // Dropdown Click Logic
+            const gameDropdownBtn = document.getElementById('gameDropdown');
+            const dropdownContent = document.querySelector('.dropdown-content');
+
+            if (gameDropdownBtn && dropdownContent) {
+                gameDropdownBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdownContent.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking elsewhere
+                window.addEventListener('click', () => {
+                    if (dropdownContent.classList.contains('show')) {
+                        dropdownContent.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

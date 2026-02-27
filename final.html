@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Kelas Ceria</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/images/number-blocks.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="scene final-scene">
+        <div class="game-overlay">
+            <!-- Interactive Numbers -->
+            <div class="interactive-numbers">
+                <div class="number-spot" data-number="1" style="left: 3%; top: 40%;">1</div>
+                <div class="number-spot" data-number="2" style="left: 20%; top: 50%;">2</div>
+                <div class="number-spot" data-number="3" style="left: 50%; top: 45%;">3</div>
+                <div class="number-spot" data-number="4" style="left: 75%; top: 70%;">4</div>
+                <div class="number-spot" data-number="5" style="left: 82%; top: 25%;">5</div>
+            </div>
+
+            <div class="back-nav">
+                <button onclick="window.location.href='game.html'" class="back-btn">Kembali</button>
+            </div>
+        </div>
+        <div class="music-control" id="musicToggle">
+            <span class="music-icon">🔊</span>
+        </div>
+        <div class="transition-overlay out" id="transitionOverlay"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
