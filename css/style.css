@@ -33,7 +33,7 @@ body {
 /* Board Text Placement */
 .board-container {
     position: absolute;
-    top: 25%;
+    top: 15%;
     /* Adjusted to overlay the white board in the image */
     left: 50%;
     transform: translate(-50%, -50%);

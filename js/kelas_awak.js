@@ -46,12 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const availableEmojis = ['📖', '🍎', '🎒', '🎨', '🪴'];
-    const emojiNames = {
-        '📖': 'buku',
-        '🍎': 'epal',
-        '🎒': 'beg',
-        '🎨': 'palet warna air',
-        '🪴': 'pokok'
+    const emojiSpecs = {
+        '📖': { name: 'buku', d1Audio: 'berapa-buku_pmXAMFAM.ogg' },
+        '🍎': { name: 'epal', d1Audio: 'berapa-epal_kYi8SgEh.ogg' },
+        '🎒': { name: 'beg', d1Audio: 'berapa-beg_s6u1NZA8.ogg' },
+        '🎨': { name: 'palet warna air', d1Audio: 'berapa-palet-air_AeMI1WJh.ogg' },
+        '🪴': { name: 'pokok', d1Audio: 'berapa-pokok_DWlSs8Sk.ogg' }
     };
     const MAX_ITEMS = 5;
 
@@ -82,8 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
         totalItemsRound = Math.floor(Math.random() * MAX_ITEMS) + 1;
 
         if (botDialogue) {
-            botDialogue.innerText = `Berapa ${emojiNames[emoji]} yang ada di atas meja?`;
+            const spec = emojiSpecs[emoji];
+            botDialogue.innerText = `Berapa ${spec.name} yang ada di atas meja?`;
             botDialogue.classList.add('show');
+
+            const d1Sound = new Audio(`assets/audio/dialog 1 bot/${spec.d1Audio}`);
+            d1Sound.play().catch(() => { });
         }
 
         // Place items
@@ -162,7 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Determine the current emoji text by checking any placed object
                 const anyObj = kidDropZone.querySelector('.placed-object');
                 const emojiChar = anyObj ? anyObj.innerText : '📖';
-                botDialogue.innerText = `Ooo ada ${totalItemsRound} ${emojiNames[emojiChar] || 'barang'} yang ada dia atas meja ini.`;
+                const spec = emojiSpecs[emojiChar] || emojiSpecs['📖'];
+                botDialogue.innerText = `Ooo ada ${totalItemsRound} ${spec.name} yang ada dia atas meja ini.`;
+
+                // Play Dialog 2 audio
+                const d2Sound = new Audio(`assets/audio/dialog 2 bot/${spec.name}/ada ${totalItemsRound} ${spec.name}.ogg`);
+                d2Sound.play().catch(() => { });
             }
 
             setTimeout(() => {
